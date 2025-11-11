@@ -10,12 +10,12 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 import torch
 from loss.L1 import L1_loss
 from loss.Perceptual_our import PerceptualLoss, L_color
-import core.clip_common
+from core import clip_common
 from argparse import Namespace
 from data.dataloader import Train_dataset, Val_kdataset
 from pytorch_lightning import seed_everything
 from core.monitor import Monitor as mo
-
+from core.ram.models.ram_lora import ram
 from core.network  import DIE
 from core.DA_text import perception
 from core.SIEM import process_batch
@@ -29,6 +29,13 @@ model, preprocess = clip_common.load_clip_model(device='cpu')
 model.to(device)
 for para in model.parameters():
     para.requires_grad = False
+
+RAM = ram(pretrained='/data2/wangfukuan/project/new_research/SeeSR/preset/models/ram_swin_large_14m.pth',
+        #   pretrained='/models/ram_swin_large_14m.pth',
+            pretrained_condition = None,
+            image_size=384,
+            vit='swin_l')
+RAM.eval().to(device, dtype=torch.float16)
 
 class CoolSystem(pl.LightningModule):
 
@@ -70,9 +77,9 @@ class CoolSystem(pl.LightningModule):
 
     def forward(self, x, ref):
 
-        Degradation_feature = perception(x, model, device)
+        probs, Degradation_feature = perception(x, model, device)
 
-        Tags_feature = process_batch(x, model, device)
+        Tags_feature = process_batch(x, RAM, model, device)
         
         y = self.model(x, Degradation_feature, Tags_feature)
 
