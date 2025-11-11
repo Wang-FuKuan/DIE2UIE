@@ -37,7 +37,6 @@ class TextEncoder(nn.Module):
 class Prompts(nn.Module):
     def __init__(self, initials=None, model=None):
         super(Prompts, self).__init__()
-        self.model = model
         self.text_encoder = TextEncoder(model)
         text = tokenize_text(initials).cuda()
         self.embedding_prompt = nn.Parameter(model.token_embedding(text).requires_grad_()).cuda()
