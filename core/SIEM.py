@@ -4,7 +4,6 @@ import clip
 import torch.nn as nn
 from torchvision import transforms
 from torchvision.transforms import ToPILImage
-from core.ram.models.ram_lora import ram
 import numpy as np
 from PIL import Image
 from skimage import color
@@ -53,36 +52,21 @@ def Degradation_suppression(image, micro=1.0, delta=0.7, mask_threshold=0.85, ma
 
     return compensated_rgb
 
-def process_batch(batch_ram, clip_model, device):
+def process_batch(batch_ram, ram_model, clip_model, device):
 
-    model = clip_model
-    RAM = ram(pretrained='/models/ram_swin_large_14m.pth',
-                pretrained_condition = None,
-                image_size=384,
-                vit='swin_l')
-    RAM.eval().to(device, dtype=torch.float16)
-
-    tensor_transforms = transforms.Compose([
-                    transforms.ToTensor(),
-                ])
-
-    ram_transforms = transforms.Compose([
-                transforms.Resize((384, 384)),
-                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-            ])
-    
-    ram_model = RAM
     batch_prompts = []
 
     for i in range(batch_ram.size(0)):
 
         single_image = batch_ram[i]
-        ref = Degradation_suppression(np.array(single_image))
+        img_np = single_image.detach().cpu()
+        img_np = img_np.permute(1, 2, 0).numpy()
+        if img_np.dtype != np.uint8:
+            img_np = np.clip(img_np * 255.0, 0, 255).astype(np.uint8)
+        ref = Degradation_suppression(img_np)
         ref = Image.fromarray(ref)
-        to_pil = ToPILImage()
-        single_image = to_pil(ref)
 
-        single_image = tensor_transforms(single_image).unsqueeze(0).to(device)
+        single_image = tensor_transforms(ref).unsqueeze(0).to(device)
         single_image = ram_transforms(single_image)
         single_image = single_image.half()
         with torch.no_grad():
