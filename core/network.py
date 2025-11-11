@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from pdb import set_trace as stx
 import numbers
 from einops import rearrange
 from einops.layers.torch import Rearrange
@@ -177,6 +176,7 @@ class DIE(nn.Module):
         self.patch_embed = OverlapPatchEmbed(inp_channels, dim)
 
         self.prompt_reduce = nn.Conv2d(512, 320, kernel_size=1, bias=False)
+        self.prompt_reduce_1 = nn.Conv2d(512, 128, kernel_size=1, bias=False)
 
         self.dec3_reduce = nn.Conv2d(704, 704, kernel_size=1, bias=False)
 
@@ -253,7 +253,7 @@ class DIE(nn.Module):
         inp_enc_level4 = self.down3_4(out_enc_level3)
         latent0 = self.latent(inp_enc_level4)
         prompt_T = Tags_feature.unsqueeze(-1).unsqueeze(-1)
-        prompt_D = Degradation_feature.mean(dim=1).unsqueeze(-1).unsqueeze(-1)
+        prompt_D = Degradation_feature.unsqueeze(-1).unsqueeze(-1)
 
         if self.decoder:
             dec3_param = prompt_T.expand(-1, -1, latent0.size(2), latent0.size(3))
@@ -272,6 +272,7 @@ class DIE(nn.Module):
 
 
         inp_dec_level3 = self.up4_3(latent0)
+        inp_dec_level3 = torch.cat([inp_dec_level3, out_enc_level3], 1)
         inp_dec_level3 = self.reduce_chan_level3(inp_dec_level3)
         out_dec_level3 = self.decoder_level3(inp_dec_level3)
 
