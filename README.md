@@ -20,10 +20,11 @@ Dependencies are listed in requirements.txt.
 Recommended setup (conda):
 
 ```bash
-git clone <your-repo-url>
+# git clone this repository
+git clone https://github.com/Wang-FuKuan/DIE2UIE.git
 cd DIE2UIE
 
-conda create -n die2uie python=3.10 -y
+conda create -n die2uie python=3.9 -y
 conda activate die2uie
 
 pip install -r requirements.txt
@@ -36,7 +37,7 @@ Download UIEBD dataset:
 
 Place the dataset anywhere on your disk and configure its root path in train_DIE.py (see Training section).
 
-Suggested dataset layout (adjust to your actual UIEBD folder structure):
+Suggested dataset layout:
 
 ```text
 UIEBD/
@@ -101,7 +102,7 @@ Before running, open train_DIE.py and configure (at minimum):
 - Output directory for checkpoints/logs
 - Training hyperparameters you want to change (batch size, learning rate, epochs, GPU id, etc.)
 
-Acknowledgements
+## Acknowledgements
 
 This work references or is inspired by the following projects:
 - CLIP-LIT: https://github.com/ZhexinLiang/CLIP-LIT
@@ -109,15 +110,7 @@ This work references or is inspired by the following projects:
 - Recognize Anything (RAM): https://github.com/xinyu1205/recognize-anything
 - PromptIR: https://github.com/va1shn9v/PromptIR
 
-Citation
+## Citation
 
 If you find this repository useful, please cite the corresponding paper:
 
-```bibtex
-@article{die2uie,
-  title={Underwater Image Enhancement via Degradation Information Extraction and Guidance},
-  author={},
-  journal={},
-  year={}
-}
-```
