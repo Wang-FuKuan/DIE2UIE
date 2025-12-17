@@ -4,22 +4,16 @@ Underwater Image Enhancement via Degradation Information Extraction and Guidance
 
 This repository provides training code and setup instructions for DIE2UIE. The method extracts degradation information and uses it as guidance for underwater image enhancement.
 
-Repository status
-- This repo currently provides the training entry (train_DIE.py) and the required preparation steps (degradation prompt initialization and pretrained RAM).
-- If you are looking for a ready-to-run inference script, you can adapt the validation/testing part in train_DIE.py.
 
-Contents
+## Contents
 - Environment
-- Dataset (UIEBD)
+- Dataset
 - Preparation
-  - Step 1: Degradation prompt initialization (CLIP-LIT style)
-  - Step 2: Pretrained RAM weights
 - Training
-- Notes
 - Acknowledgements
 - Citation
 
-Environment
+## Environment
 
 Dependencies are listed in requirements.txt.
 
@@ -35,16 +29,7 @@ conda activate die2uie
 pip install -r requirements.txt
 ```
 
-GPU note
-- If you use CUDA, install a PyTorch build matching your CUDA driver/toolkit first, then install the remaining packages from requirements.txt.
-
-Quick check:
-
-```bash
-python -c "import torch; print('torch:', torch.__version__); print('cuda available:', torch.cuda.is_available())"
-```
-
-Dataset (UIEBD)
+## Dataset (UIEBD)
 
 Download UIEBD dataset:
 - https://drive.google.com/drive/folders/1xcU3_SOgAW9gDmhj9XNE4HKAikLGnwq2?usp=sharing
@@ -57,14 +42,11 @@ Suggested dataset layout (adjust to your actual UIEBD folder structure):
 UIEBD/
   train/
   val/
-  test/
 ```
 
-If your dataloader expects specific subfolders (e.g., images/, labels/), follow the exact structure required by this repository.
+## Preparation
 
-Preparation
-
-Step 1: Degradation prompt initialization (CLIP-LIT style)
+### Step 1: Degradation prompt initialization (CLIP-LIT style)
 
 This project initializes degradation prompts using the dataset splits provided in:
 
@@ -79,10 +61,8 @@ What you need to do
 3. Export the learned degradation prompt weights to a file (example path: weights/degradation_prompt_init.pth).
 4. Configure train_DIE.py to load this prompt initialization checkpoint.
 
-Notes
-- Some operating systems treat folder names with spaces differently in shell commands. If the folder name contains spaces, wrap the path in quotes when using the terminal.
 
-Step 2: Pretrained RAM weights
+### Step 2: Pretrained RAM weights
 
 This project uses Recognize Anything Model (RAM) as a pretrained component.
 
@@ -103,7 +83,7 @@ DIE2UIE/
 
 Then set the corresponding paths in train_DIE.py.
 
-Training
+## Training
 
 Training entry:
 - train_DIE.py
@@ -121,26 +101,6 @@ Before running, open train_DIE.py and configure (at minimum):
 - Output directory for checkpoints/logs
 - Training hyperparameters you want to change (batch size, learning rate, epochs, GPU id, etc.)
 
-If your local version of train_DIE.py supports CLI arguments, you can run it like this (argument names may differ; adjust to your code):
-
-```bash
-python train_DIE.py   --data_root /path/to/UIEBD   --ram_ckpt /path/to/DIE2UIE/weights/ram_swin_large_14m.pth   --prompt_ckpt /path/to/DIE2UIE/weights/degradation_prompt_init.pth   --save_dir checkpoints/die2uie
-```
-
-Outputs
-- Checkpoints and logs are written to the output directory configured in train_DIE.py.
-
-Notes
-
-Common issues
-- Dataset not found: confirm the dataset root path and the expected directory structure.
-- Missing pretrained weights: confirm ram_swin_large_14m.pth exists and the path matches what train_DIE.py loads.
-- CUDA errors: ensure your PyTorch CUDA build matches your NVIDIA driver/toolkit.
-
-Reproducibility tips
-- Log the git commit, package versions (pip freeze), and all training configs.
-- Set random seeds in train_DIE.py if you need deterministic behavior.
-
 Acknowledgements
 
 This work references or is inspired by the following projects:
@@ -151,7 +111,7 @@ This work references or is inspired by the following projects:
 
 Citation
 
-If you find this repository useful, please cite the corresponding paper (update with your publication details):
+If you find this repository useful, please cite the corresponding paper:
 
 ```bibtex
 @article{die2uie,
